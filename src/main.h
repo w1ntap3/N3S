@@ -2,6 +2,6 @@
 #include <stdint.h>
 
 // LED debug the function
-void debug_func(uint8_t actual, uint8_t expected);
+void debug_func(void);
 
 void ddr_setup(void);

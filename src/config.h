@@ -17,5 +17,11 @@
 #define OLED_DC_DDR DDRC
 #define OLED_CS_DDR DDRB
 
+// Screen resolution
+#define OLED_SCREEN_WIDTH 128
+#define OLED_SCREEN_HEIGHT 64
+#define OLED_PAGES 8
+#define OLED_SEG 128
+
 // LED Debug pin
 #define DEBUG_GPIO PD7
