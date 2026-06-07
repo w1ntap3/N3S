@@ -1,3 +1,6 @@
+// config.h:
+// Board support for AVR MCUs
+
 // SPI OLED pinout
 #define OLED_D0 PB5 // D0 is SCLK in 4 wire SPI mode
 #define OLED_D1 PB3 // D0 is SDIN in 4 wire SPI mode
@@ -25,3 +28,8 @@
 
 // LED Debug pin
 #define DEBUG_GPIO PD7
+
+// LED debug the function
+void debug_func(void);
+
+void ddr_setup(void);

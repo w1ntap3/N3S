@@ -15,6 +15,8 @@
 #include <avr/io.h>
 #include "spi.h"
 
+uint8_t spi_initialized = 0;
+
 /*
  * spi_init()
  *
@@ -41,6 +43,8 @@ void spi_init(uint8_t spcr, uint8_t spsr)
   /* update the control and status registers */
   SPCR = spcr;
   SPSR = spsr;
+
+  spi_initialized = 1;
 
 } /* end spi_init() */
 

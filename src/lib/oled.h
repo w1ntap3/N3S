@@ -1,3 +1,5 @@
+// AVR driver for SSD1306 4-wire SPI 0.96" with communication over spi.h
+
 #include "spi.h"
 #include <stdint.h>
 
@@ -26,43 +28,9 @@
 #define OLED_RESET_PAGE_ADDRESS_HORIZONTAL 0x22
 #define OLED_RESET_COLUMN_ADDRESS_HORIZONTAL 0x21
 
-// Macro
-#define Y_TO_PAGE(y) (y-(y%8))/8
-
-typedef enum
-{
-    OLED_OK = 0,
-    OLED_ERROR
-} oled_status;
-
-typedef struct {
-    uint8_t x;
-    uint8_t y;
-} oled_pixel;
-
-typedef struct {
-    oled_pixel p1;
-    oled_pixel p2;
-} oled_line;
-
-typedef struct {
-    oled_pixel p1;
-    oled_pixel p2;
-    uint8_t fill;
-} oled_rectangle;
-
-typedef struct {
-    oled_pixel p1;
-    oled_pixel p2;
-    oled_pixel p3;
-    uint8_t fill;
-} oled_triangle;
+void oled_cmd(uint8_t cmd);
+void oled_data(uint8_t data);
 
 void oled_init(void);
 void oled_clear(void);
-oled_status oled_draw_pixel(oled_pixel pixel);
-// Uses Bresenham's Line Algorithm
-void oled_draw_line(oled_line line);
-static void oled_draw_line_low_high(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t lowhigh);
-void oled_draw_rectangle(oled_rectangle rectangle);
-void oled_draw_triangle(oled_triangle triangle);
+void oled_flush(void);
