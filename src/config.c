@@ -1,8 +1,9 @@
 #include "config.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include "lib/oled.h"
 
-void ddr_setup(void)
+void hardware_init(void)
 {
         // clock_prescaler_off
         CLKPR = (1 << CLKPCE);
@@ -17,6 +18,8 @@ void ddr_setup(void)
         OLED_D0_DDR |= _BV(OLED_D0);
         OLED_D1_DDR |= _BV(OLED_D1);
         OLED_CS_DDR |= _BV(OLED_CS);
+
+        oled_init();
 }
 
 void debug_func(void)
