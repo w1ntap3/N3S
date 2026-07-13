@@ -1,6 +1,7 @@
 #ifndef FONT_H
 #define FONT_H
 
+#include <avr/pgmspace.h>
 #include <stdint.h>
 // File taken from https://github.com/efthymios-ks/AVR-SSD1306/
 

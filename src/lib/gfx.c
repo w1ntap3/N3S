@@ -153,8 +153,8 @@ void gfx_draw_char(gfx_pixel pos, char c, uint8_t invert) {
   for (uint8_t col = 0; col < FONT_WIDTH; col++) {
     if (seg + col > 127)
       break;
-    uint8_t data = invert ? ~font_array[index + col] : font_array[index + col];
 
+    uint8_t data = invert ? ~font_array[index + col] : font_array[index + col];
     if (y_offset == 0) {
       oled_buffer[page][seg + col] = data;
     } else {
@@ -177,7 +177,7 @@ void gfx_draw_string(gfx_pixel pos, const char *s, uint8_t invert) {
   gfx_pixel cursor = pos;
   while (*s) {
     gfx_draw_char(cursor, *s, invert);
-    cursor.x += FONT_WIDTH + 1;
+    cursor.x += FONT_WIDTH + 0;
     s++;
   }
 }

@@ -2,6 +2,7 @@
 // Board support for AVR MCUs
 #ifndef CONFIG_H
 #define CONFIG_H
+#include "lib/font.h"
 #include <avr/io.h>
 
 // SPI OLED pinout
@@ -31,9 +32,10 @@
 
 // UI grid
 #define CELL_WIDTH (OLED_SCREEN_WIDTH / 2)
-#define CELL_HEIGHT (OLED_SCREEN_HEIGHT / 4)
-#define CELL_COUNT 8
-
+#define CELL_HEIGHT FONT_HEIGHT
+#define CELL_COUNT                                                             \
+  (OLED_SCREEN_HEIGHT / CELL_HEIGHT) * (OLED_SCREEN_WIDTH / CELL_WIDTH)
+#define CELL_PADDING 5
 // LED Debug pin
 #define DEBUG_GPIO PD7
 
