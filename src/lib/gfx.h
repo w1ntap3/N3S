@@ -2,6 +2,9 @@
 // Middleware module that interacts with software buffer and flushes it to
 // hardware via oled.h
 
+#ifndef GFX_H
+#define GFX_H
+
 #include "../config.h"
 #include "oled.h"
 #include <stdint.h>
@@ -42,4 +45,6 @@ void gfx_draw_rectangle(gfx_rectangle rectangle);
 void gfx_draw_triangle(gfx_triangle triangle);
 
 void gfx_draw_char(gfx_pixel pos, char c, uint8_t invert);
-void gfx_draw_string(gfx_pixel pos, const char* s, uint8_t invert);
+void gfx_draw_string(gfx_pixel pos, const char *s, uint8_t invert);
+
+#endif

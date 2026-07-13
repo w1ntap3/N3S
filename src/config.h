@@ -1,6 +1,7 @@
 // config.h:
 // Board support for AVR MCUs
-
+#ifndef CONFIG_H
+#define CONFIG_H
 #include <avr/io.h>
 
 // SPI OLED pinout
@@ -28,6 +29,11 @@
 #define OLED_PAGES 8
 #define OLED_SEG 128
 
+// UI grid
+#define CELL_WIDTH (OLED_SCREEN_WIDTH / 2)
+#define CELL_HEIGHT (OLED_SCREEN_HEIGHT / 4)
+#define CELL_COUNT 8
+
 // LED Debug pin
 #define DEBUG_GPIO PD7
 
@@ -38,3 +44,5 @@
 void debug_func(void);
 
 void hardware_init(void);
+
+#endif

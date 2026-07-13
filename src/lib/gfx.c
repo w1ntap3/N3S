@@ -120,7 +120,8 @@ void gfx_draw_rectangle(gfx_rectangle rectangle) {
   gfx_draw_line(DA);
 
   if (rectangle.fill) {
-    gfx_fill_rect(A_vertex.x + 1, A_vertex.y + 1, C_vertex.x - 1, C_vertex.y - 1);
+    gfx_fill_rect(A_vertex.x + 1, A_vertex.y + 1, C_vertex.x - 1,
+                  C_vertex.y - 1);
   }
 }
 
@@ -145,14 +146,27 @@ void gfx_draw_char(gfx_pixel pos, char c, uint8_t invert) {
     return;
 
   uint8_t page = pos.y / 8;
+  uint8_t y_offset = pos.y % 8;
   uint8_t seg = pos.x;
   uint16_t index = (c - FONT_OFFSET) * FONT_WIDTH;
 
   for (uint8_t col = 0; col < FONT_WIDTH; col++) {
     if (seg + col > 127)
       break;
-    uint8_t glyph = font_array[index + col];
-    oled_buffer[page][seg + col] = invert ? ~glyph : glyph;
+    uint8_t data = invert ? ~font_array[index + col] : font_array[index + col];
+
+    if (y_offset == 0) {
+      oled_buffer[page][seg + col] = data;
+    } else {
+      oled_buffer[page][seg + col] &= ~((uint8_t)(0xFF << y_offset));
+      oled_buffer[page][seg + col] |= (data << y_offset);
+
+      if (page + 1 < OLED_PAGES) {
+        oled_buffer[page + 1][seg + col] &=
+            ~((uint8_t)(0xFF >> (8 - y_offset)));
+        oled_buffer[page + 1][seg + col] |= (data >> (8 - y_offset));
+      }
+    }
   }
 }
 

@@ -35,6 +35,8 @@ void oled_init(void) {
 
   // Initialization commands
   spi_transfer(OLED_OFF);
+  spi_transfer(OLED_COM_PINS);
+  spi_transfer(OLED_COM_PINS_VALUE);
   spi_transfer(OLED_CONTRAST_CONTROL);
   spi_transfer(OLED_CONTRAST);
   spi_transfer(OLED_SHOW_RAM);
