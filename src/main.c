@@ -1,80 +1,99 @@
 #include "main.h"
 #include "config.h"
-#include "lib/gfx.h"
-#include "lib/oled.h"
 #include "lib/ui.h"
-#include "util/delay.h"
-#include <stdint.h>
+#include "lib/eeprom.h"
+#include <util/delay.h>
 
-int main() {
-  hardware_init();
+static uint8_t failures;
 
-  while (1) {
-    // Screen 1: File list (2 columns)
-    oled_clear();
-    ui_draw_cell(0, 0, "settings", 1);
-    ui_draw_cell(64, 0, "data.bin", 0);
-    ui_draw_cell(0, 8, "config.e", 0);
-    ui_draw_cell(64, 8, "log.txt", 0);
-    ui_draw_cell(0, 16, "cache.i", 0);
-    ui_draw_cell(64, 16, "temp.v", 0);
-    ui_draw_cell(0, 24, "backup.t", 0);
-    ui_draw_cell(64, 24, "user.d", 0);
-    ui_draw_cell(0, 32, "sys.e", 0);
-    ui_draw_cell(64, 32, "app.i", 0);
-    ui_draw_cell(0, 40, "net.v", 0);
-    ui_draw_cell(64, 40, "usb.t", 0);
-    ui_draw_cell(0, 48, "mem.e", 0);
-    ui_draw_cell(64, 48, "cpu.i", 0);
-    ui_draw_cell(0, 56, "pwr.v", 0);
-    ui_draw_cell(64, 56, "io.t", 0);
+static void test_line(uint8_t row, const char *label, uint8_t pass) {
+    gfx_pixel pos = {.x = 0, .y = row * 8};
+    char line[22];
+    uint8_t i = 0;
+    if (pass) {
+        line[i++] = 'O';
+        line[i++] = 'K';
+    } else {
+        line[i++] = '!';
+        line[i++] = '!';
+        failures++;
+    }
+    line[i++] = ' ';
+    while (*label && i < 21)
+        line[i++] = *label++;
+    line[i] = '\0';
+    gfx_draw_string(pos, line, !pass);
     oled_flush();
-    _delay_ms(2000);
+    _delay_ms(300);
+}
 
-    // Screen 2: Specs (2 columns)
+int main(void) {
+    uint8_t buf[8];
+    failures = 0;
+
+    hardware_init();
+    eeprom_init();
     oled_clear();
-    ui_draw_spec(0, "name", "sys");
-    ui_draw_spec(8, "type", "app");
-    ui_draw_spec(16, "size", "2k");
-    ui_draw_spec(24, "date", "24");
-    ui_draw_spec(32, "stat", "ok");
-    ui_draw_spec(40, "mode", "rw");
-    ui_draw_spec(48, "freq", "8M");
-    ui_draw_spec(56, "ram", "2k");
-    oled_flush();
-    _delay_ms(2000);
 
-    // Screen 3: Loading
-    for (uint8_t i = 0; i <= 100; i += 10) {
-      ui_draw_progress_bar("loading", i);
-      oled_flush();
-      _delay_ms(300);
+    gfx_draw_string((gfx_pixel){.x = 0, .y = 0}, "EEPROM DIAGNOSTIC", 0);
+    oled_flush();
+    _delay_ms(600);
+
+    /* --- byte write + random read @ 0x0000 --- */
+    eeprom_byte_write(0x0000, 0x55);
+    while (!eeprom_ready())
+        ;
+    test_line(1, "W/R 0x0000:55", eeprom_random_read(0x0000) == 0x55);
+
+    /* --- byte write + random read @ 0x7FFF (last address) --- */
+    eeprom_byte_write(0x7FFF, 0xAA);
+    while (!eeprom_ready())
+        ;
+    test_line(2, "W/R 0x7FFF:AA", eeprom_random_read(0x7FFF) == 0xAA);
+
+    /* --- current address read: sets counter via read at addr-1 --- */
+    eeprom_byte_write(0x0042, 0xC3);
+    while (!eeprom_ready())
+        ;
+    eeprom_random_read(0x0041);
+    test_line(3, "CUR RD 0x0042", eeprom_current_read() == 0xC3);
+
+    /* --- sequential read --- */
+    eeprom_byte_write(0x0200, 0xDE);
+    while (!eeprom_ready())
+        ;
+    eeprom_byte_write(0x0201, 0xAD);
+    while (!eeprom_ready())
+        ;
+    eeprom_byte_write(0x0202, 0xBE);
+    while (!eeprom_ready())
+        ;
+    eeprom_byte_write(0x0203, 0xEF);
+    while (!eeprom_ready())
+        ;
+    eeprom_sequential_read(0x0200, buf, 4);
+    test_line(4, "SEQ DEADBEEF",
+              buf[0] == 0xDE && buf[1] == 0xAD && buf[2] == 0xBE &&
+                  buf[3] == 0xEF);
+
+    /* --- page write + sequential read --- */
+    {
+        const uint8_t page[8] = {0x01, 0x23, 0x45, 0x67,
+                                 0x89, 0xAB, 0xCD, 0xEF};
+        eeprom_page_write(0x0300, page, 8);
+        while (!eeprom_ready())
+            ;
+        eeprom_sequential_read(0x0300, buf, 8);
+        uint8_t page_ok = 1;
+        for (uint8_t j = 0; j < 8; j++)
+            page_ok &= (buf[j] == page[j]);
+        test_line(5, "PAGE 8B 0123..", page_ok);
     }
 
-    // Screen 4: Graphics demo
-    oled_clear();
+    /* --- final verdict on bottom row --- */
+    test_line(7, "ALL PASS", failures == 0);
 
-    // Draw lines
-    gfx_line l1 = {.p1 = {.x = 0, .y = 0}, .p2 = {.x = 127, .y = 31}};
-    gfx_line l2 = {.p1 = {.x = 127, .y = 0}, .p2 = {.x = 0, .y = 31}};
-    gfx_draw_line(l1);
-    gfx_draw_line(l2);
-
-    // Draw rectangles
-    gfx_rectangle r1 = {
-        .p1 = {.x = 10, .y = 40}, .p2 = {.x = 50, .y = 62}, .fill = 0};
-    gfx_rectangle r2 = {
-        .p1 = {.x = 70, .y = 40}, .p2 = {.x = 110, .y = 62}, .fill = 1};
-    gfx_draw_rectangle(r1);
-    gfx_draw_rectangle(r2);
-
-    // Draw text
-    gfx_pixel txt = {.x = 0, .y = 33};
-    gfx_draw_string(txt, "gfx demo", 0);
-
-    oled_flush();
-    _delay_ms(2000);
-  }
-
-  return 0;
+    while (1)
+        ;
+    return 0;
 }

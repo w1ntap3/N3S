@@ -4,6 +4,7 @@
 #define CONFIG_H
 #include "lib/font.h"
 #include <avr/io.h>
+// NSG
 
 // SPI OLED pinout
 #define OLED_D0 PB5 // D0 is SCLK in 4 wire SPI mode
@@ -38,6 +39,24 @@
 #define CELL_PADDING 5
 // LED Debug pin
 #define DEBUG_GPIO PD7
+
+// NSFS
+
+// EEPROM pinout
+#define EEPROM_SDA PC4
+#define EEPROM_SCL PC5
+
+#define EEPROM_SDA_PORT PORTC
+#define EEPROM_SCL_PORT PORTC
+
+#define EEPROM_SDA_DDR DDRC
+#define EEPROM_SCL_DDR DDRC
+
+#define EEPROM_A0 0
+#define EEPROM_A1 0
+#define EEPROM_A2 0
+
+// NSP
 
 // UART
 #define UART_BAUD_RATE 9600
