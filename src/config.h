@@ -37,8 +37,6 @@
 #define CELL_COUNT                                                             \
   (OLED_SCREEN_HEIGHT / CELL_HEIGHT) * (OLED_SCREEN_WIDTH / CELL_WIDTH)
 #define CELL_PADDING 5
-// LED Debug pin
-#define DEBUG_GPIO PD7
 
 // NSFS
 
@@ -60,9 +58,6 @@
 
 // UART
 #define UART_BAUD_RATE 9600
-
-// LED debug the function
-void debug_func(void);
 
 void hardware_init(void);
 

@@ -11,16 +11,10 @@
 #define EEPROM_READ_ADDRESS 0b10100000 | (EEPROM_ADDRESS << 1) | 1
 #define EEPROM_TIME_WRITE 5 // ms
 
+#define EEPROM_SLA (0x50 | EEPROM_ADDRESS)
 void eeprom_init(void);
 
-void eeprom_byte_write(uint16_t address, uint8_t data);
-void eeprom_page_write(uint16_t address, const uint8_t data[],
-                       uint8_t data_count);
-uint8_t eeprom_ready(void);
-
-uint8_t eeprom_current_read();
-uint8_t eeprom_random_read(uint16_t address);
-void eeprom_sequential_read(uint16_t address, uint8_t *seq_data,
-                            uint16_t data_count);
+void eeprom_write(uint16_t address, const uint8_t *data, uint16_t length);
+void eeprom_read(uint16_t address, uint8_t *data, uint16_t length);
 
 #endif
