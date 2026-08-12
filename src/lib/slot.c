@@ -1,6 +1,7 @@
 #include "slot.h"
 #include "eeprom.h"
 #include <stdint.h>
+#include <sys/types.h>
 
 static const uint8_t metadata[HEADER_METADATA_BYTES] = {
 	'A', 'Z', 'E', HEADER_VERSION, 0, 0, 0, 0,
@@ -64,4 +65,75 @@ void slot_table_format(void) {
 	for (uint8_t i = 0; i < HEADER_SECTIONS; i++)
 		busy_slots[i] = 0;
 	slots_initialized = 0;
+}
+
+slot_ret_t slot_free(const slot_section_t section, const uint8_t entry) {
+	if (section >= HEADER_SECTIONS)
+		return SL_INVALID_SECTION;
+	if (entry >= SLOTS_PER_SECTION)
+		return SL_INVALID_SLOT;
+
+	uint8_t empty_slot[SLOT_ENTRY_SIZE] = {0};
+	eeprom_write(SLOT_ENTRIES_ADDRESS +
+			     (section * SLOTS_PER_SECTION + entry) *
+				     SLOT_ENTRY_SIZE,
+		     empty_slot, SLOT_ENTRY_SIZE);
+
+	update_slot_busy(section * SLOTS_PER_SECTION + entry, 0);
+	return SL_OK;
+}
+slot_ret_t slot_write(const slot_section_t section, const uint8_t entry,
+		      const uint8_t *data, const uint8_t data_size) {
+	if (section >= HEADER_SECTIONS)
+		return SL_INVALID_SECTION;
+	if (entry >= SLOTS_PER_SECTION)
+		return SL_INVALID_SLOT;
+	if (!data)
+		return SL_NO_WRITE_DATA;
+
+	uint8_t write_offset = 0;
+	eeprom_read(SLOT_ENTRIES_ADDRESS +
+			    (section * SLOTS_PER_SECTION + entry) *
+				    SLOT_ENTRY_SIZE +
+			    SLOT_WRITE_OFFSET,
+		    &write_offset, 1);
+
+	if (data_size > (SLOT_DATA_BYTES - write_offset))
+		return SL_WRITE_TOO_BIG;
+
+	eeprom_write(section_address[section] + entry * SLOT_DATA_BYTES +
+			     write_offset,
+		     data, data_size);
+
+	uint8_t new_write_offset = write_offset + data_size;
+
+	eeprom_write(SLOT_ENTRIES_ADDRESS +
+			     (section * SLOTS_PER_SECTION + entry) *
+				     SLOT_ENTRY_SIZE +
+			     SLOT_WRITE_OFFSET,
+		     &new_write_offset, 1);
+	return SL_OK;
+}
+slot_ret_t slot_read(const slot_section_t section, const uint8_t entry,
+		     uint8_t *buf, const uint8_t buf_size) {
+	if (section >= HEADER_SECTIONS)
+		return SL_INVALID_SECTION;
+	if (entry >= SLOTS_PER_SECTION)
+		return SL_INVALID_SLOT;
+	if (!buf)
+		return SL_INVALID_BUFFER;
+
+	uint8_t write_offset = 0;
+	eeprom_read(SLOT_ENTRIES_ADDRESS +
+			    (section * SLOTS_PER_SECTION + entry) *
+				    SLOT_ENTRY_SIZE +
+			    SLOT_WRITE_OFFSET,
+		    &write_offset, 1);
+
+	if (buf_size < write_offset)
+		return SL_BUFFER_TOO_SMALL;
+
+	eeprom_read(section_address[section] + entry * SLOT_DATA_BYTES, buf,
+		    write_offset);
+	return SL_OK;
 }

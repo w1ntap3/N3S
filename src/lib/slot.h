@@ -10,15 +10,25 @@
 #define SLOTS_PER_SECTION 64
 #define SLOT_ENTRY_SIZE 10
 #define SLOT_DATA_BYTES 114
+#define SECTION_SIZE (SLOT_DATA_BYTES * SLOTS_PER_SECTION)
 #define HEADER_SECTIONS 4
 #define HEADER_MAX_SLOTS (SLOTS_PER_SECTION * HEADER_SECTIONS)
-// Data segment
 #define DATA_ADDRESS                                                           \
 	HEADER_METADATA_BYTES +                                                \
 		HEADER_SECTIONS * SLOTS_PER_SECTION * SLOT_ENTRY_SIZE
-#define SECTION_SIZE (SLOT_DATA_BYTES * SLOTS_PER_SECTION)
-
-typedef enum { SL_OK = 0, SL_WRONG_METADATA } slot_ret_t;
+#define SLOT_WRITE_OFFSET                                                      \
+	(SLOT_MAX_FILENAME + 1) // SLOT_MAX_FILENAME amount of bytes for name +
+				// 1 order byte
+typedef enum {
+	SL_OK = 0,
+	SL_WRONG_METADATA,
+	SL_INVALID_SLOT,
+	SL_INVALID_SECTION,
+	SL_NO_WRITE_DATA,
+	SL_WRITE_TOO_BIG,
+	SL_BUFFER_TOO_SMALL,
+	SL_INVALID_BUFFER
+} slot_ret_t;
 
 typedef enum {
 	SLOT_TXT_SECTION = 0b00,
@@ -26,13 +36,6 @@ typedef enum {
 	SLOT_VEC_SECTION = 0b10,
 	SLOT_IMG_SECTION = 0b11
 } slot_section_t;
-
-typedef enum {
-	SECTION_TXT_ADDRESS = DATA_ADDRESS,
-	SECTION_EXE_ADDRESS = DATA_ADDRESS + SECTION_SIZE,
-	SECTION_VEC_ADDRESS = DATA_ADDRESS + 2 * SECTION_SIZE,
-	SECTION_IMG_ADDRESS = DATA_ADDRESS + 3 * SECTION_SIZE,
-} data_section_t;
 
 typedef struct {
 	uint8_t name[SLOT_MAX_FILENAME];
