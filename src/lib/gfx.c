@@ -126,7 +126,7 @@ void gfx_draw_rectangle(gfx_rectangle rectangle) {
 }
 
 static void gfx_fill_rect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
-  if (x0 > 127 || y0 > 63 || x1 < x0 || y1 < y0)
+  if (x0 > 127 || y0 > 63 || x1 > 127 || y1 > 63 || x1 < x0 || y1 < y0)
     return;
 
   for (uint8_t y = y0; y <= y1; y++) {

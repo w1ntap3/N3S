@@ -114,6 +114,9 @@ ret_code_t tw_master_transmit(uint8_t slave_addr, uint8_t *p_data, uint8_t len,
 ret_code_t tw_master_receive(uint8_t slave_addr, uint8_t *p_data, uint8_t len) {
 	ret_code_t error_code;
 
+	if (len == 0)
+		return SUCCESS;
+
 	error_code = tw_start();
 	if (error_code != SUCCESS) {
 		tw_stop();

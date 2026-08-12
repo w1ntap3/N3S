@@ -6,8 +6,6 @@
 
 uint8_t oled_buffer[OLED_PAGES][OLED_SEG];
 
-extern uint8_t spi_initialized;
-
 void oled_cmd(uint8_t cmd) {
   OLED_DC_PORT &= ~(_BV(OLED_DC));
   spi_transfer(cmd);

@@ -53,6 +53,8 @@
 #define SPI_DBLSPD_TRUE 1
 #define SPI_DBLSPD_FALSE  0
 
+extern uint8_t spi_initialized;
+
 uint8_t spi_transfer(uint8_t c);
 void spi_enableInterrupt();
 void spi_disableInterrupt();

@@ -72,6 +72,10 @@ slot_ret_t slot_free(const slot_section_t section, const uint8_t entry) {
 		return SL_INVALID_SECTION;
 	if (entry >= SLOTS_PER_SECTION)
 		return SL_INVALID_SLOT;
+	if (!slots_initialized)
+		return SL_WRONG_METADATA;
+	if (!(busy_slots[section] & (1ULL << entry)))
+		return SL_INVALID_SLOT;
 
 	uint8_t empty_slot[SLOT_ENTRY_SIZE] = {0};
 	eeprom_write(SLOT_ENTRIES_ADDRESS +
@@ -88,6 +92,8 @@ slot_ret_t slot_write(const slot_section_t section, const uint8_t entry,
 		return SL_INVALID_SECTION;
 	if (entry >= SLOTS_PER_SECTION)
 		return SL_INVALID_SLOT;
+	if (!slots_initialized)
+		return SL_WRONG_METADATA;
 	if (!data)
 		return SL_NO_WRITE_DATA;
 
@@ -98,6 +104,8 @@ slot_ret_t slot_write(const slot_section_t section, const uint8_t entry,
 			    SLOT_WRITE_OFFSET,
 		    &write_offset, 1);
 
+	if (write_offset > SLOT_DATA_BYTES)
+		return SL_INVALID_SLOT;
 	if (data_size > (SLOT_DATA_BYTES - write_offset))
 		return SL_WRITE_TOO_BIG;
 
@@ -120,6 +128,8 @@ slot_ret_t slot_read(const slot_section_t section, const uint8_t entry,
 		return SL_INVALID_SECTION;
 	if (entry >= SLOTS_PER_SECTION)
 		return SL_INVALID_SLOT;
+	if (!slots_initialized)
+		return SL_WRONG_METADATA;
 	if (!buf)
 		return SL_INVALID_BUFFER;
 
@@ -130,6 +140,8 @@ slot_ret_t slot_read(const slot_section_t section, const uint8_t entry,
 			    SLOT_WRITE_OFFSET,
 		    &write_offset, 1);
 
+	if (write_offset > SLOT_DATA_BYTES)
+		return SL_INVALID_SLOT;
 	if (buf_size < write_offset)
 		return SL_BUFFER_TOO_SMALL;
 

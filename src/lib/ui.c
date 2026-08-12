@@ -14,12 +14,14 @@ void ui_draw_cell(uint8_t x, uint8_t y, const char *text, uint8_t highlighted) {
 
 void ui_draw_spec(uint8_t y, const char *key, const char *value) {
   gfx_pixel pos = {.x = 0, .y = y};
-  char key_value_pair[27];
+  char key_value_pair[OLED_SCREEN_WIDTH / FONT_WIDTH + 1];
   char *p = key_value_pair;
-  while (*key)
+  char *end = key_value_pair + OLED_SCREEN_WIDTH / FONT_WIDTH;
+  while (*key && p < end)
     *p++ = *key++;
-  *p++ = ':';
-  while (*value)
+  if (p < end)
+    *p++ = ':';
+  while (*value && p < end)
     *p++ = *value++;
   *p = '\0';
   gfx_draw_string(pos, key_value_pair, 0);
