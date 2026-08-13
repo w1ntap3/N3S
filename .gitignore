@@ -7,3 +7,4 @@ fs.png
 .clang-format'
 .clangd'
 .opencode/*
+/nsfs-cli/nsfs
