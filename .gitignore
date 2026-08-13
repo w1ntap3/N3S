@@ -1,5 +1,9 @@
 /datasheets
-/src/main
-/src/main.hex
+/nsfs/main
+/nsfs/main.hex
+/nsfs-cli/nsfs-cli
 fs.md
 fs.png
+.clang-format'
+.clangd'
+.opencode/*

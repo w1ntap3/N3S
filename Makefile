@@ -9,12 +9,15 @@ BAUD := 9600
 F_CPU := 8000000UL
 
 # Program specifics
-TARGET := src/main
-SRC := $(wildcard src/*.c) $(wildcard src/lib/*.c)
+TARGET := nsfs/main
+SRC := $(wildcard nsfs/*.c) $(wildcard nsfs/lib/*.c)
 
 # Extra flags
-FLAGS := -Os -Wall -flto -ffunction-sections -fdata-sections -Wl,-gc-sections -mrelax -DUART_RX0_BUFFER_SIZE=64 -DUART_TX0_BUFFER_SIZE=64 -std=gnu99 # Optimization flags
+FLAGS := -Os -Wall -flto -ffunction-sections -fdata-sections -Wl,-gc-sections -mrelax
 SERIAL_PORT := /dev/ttyUSB0
+
+# CLI
+BINDIR := /home/wintape/.local/bin/
 
 flash: compile
 	avr-size --mcu=${MMCU} -C ${TARGET}
@@ -28,5 +31,9 @@ compile:
 	avr-gcc -mmcu=${MMCU} -DF_CPU=${F_CPU} -o ${TARGET} ${FLAGS} ${SRC}
 	avr-objcopy -O ihex -R .eeprom ${TARGET} ${TARGET}.hex
 
+cli:
+	gcc -Wall -o nsfs-cli/nsfs nsfs-cli/main.c
+	cp nsfs-cli/nsfs ${BINDIR}
+
 clean:
-	rm -f ${TARGET} ${TARGET}.hex
+	rm -f ${TARGET} ${TARGET}.hex nsfs-cli/nsfs

@@ -1,7 +1,7 @@
 #include "slot.h"
 #include "eeprom.h"
 #include <stdint.h>
-#include <sys/types.h>
+#include <string.h>
 
 static const uint8_t metadata[HEADER_METADATA_BYTES] = {
 	'A', 'Z', 'E', HEADER_VERSION, 0, 0, 0, 0,
@@ -25,6 +25,17 @@ static inline void update_slot_busy(uint16_t slot, uint8_t busy) {
 		busy_slots[section] |= (1ULL << bit);
 	else
 		busy_slots[section] &= ~(1ULL << bit);
+}
+
+static inline slot_ret_t check_name(const char *name,
+				    const uint8_t name_length) {
+	if (!name || (name_length == 0) || name_length > SLOT_MAX_FILENAME)
+		return SL_INVALID_NAME;
+	for (uint8_t c = 0; c < name_length; c++) {
+		if (name[c] == '\0')
+			return SL_INVALID_NAME;
+	}
+	return SL_OK;
 }
 
 slot_ret_t slot_header_init(void) {
@@ -65,6 +76,20 @@ void slot_table_format(void) {
 	for (uint8_t i = 0; i < HEADER_SECTIONS; i++)
 		busy_slots[i] = 0;
 	slots_initialized = 0;
+}
+
+slot_ret_t slot_occupy(const char *name, const uint8_t name_length,
+		       const slot_section_t section, uint8_t *pos_in_section) {
+	if (!slots_initialized)
+		return SL_NOT_INITIALIZED;
+	slot_ret_t err = check_name(name, name_length);
+	if (err != SL_OK)
+		return err;
+
+	Slot entry;
+	memset(entry.name, ' ', SLOT_MAX_FILENAME);
+	memcpy(entry.name, name, name_length);
+	return SL_OK;
 }
 
 slot_ret_t slot_free(const slot_section_t section, const uint8_t entry) {

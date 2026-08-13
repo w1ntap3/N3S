@@ -27,7 +27,9 @@ typedef enum {
 	SL_NO_WRITE_DATA,
 	SL_WRITE_TOO_BIG,
 	SL_BUFFER_TOO_SMALL,
-	SL_INVALID_BUFFER
+	SL_INVALID_BUFFER,
+	SL_NOT_INITIALIZED,
+	SL_INVALID_NAME,
 } slot_ret_t;
 
 typedef enum {
@@ -57,8 +59,8 @@ slot_ret_t slot_header_init(void);
 // touches software and only reads from it.
 void slot_table_format(void);
 
-slot_ret_t slot_occupy(const char *name, const slot_section_t section,
-		       uint8_t *pos_in_section);
+slot_ret_t slot_occupy(const char *name, const uint8_t name_length,
+		       const slot_section_t section, uint8_t *pos_in_section);
 slot_ret_t slot_free(const slot_section_t section, const uint8_t entry);
 slot_ret_t slot_write(const slot_section_t section, const uint8_t entry,
 		      const uint8_t *data, const uint8_t data_size);
