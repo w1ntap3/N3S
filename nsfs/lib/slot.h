@@ -30,6 +30,7 @@ typedef enum {
 	SL_INVALID_BUFFER,
 	SL_NOT_INITIALIZED,
 	SL_INVALID_NAME,
+	SL_SECTION_BUSY,
 } slot_ret_t;
 
 typedef enum {
@@ -60,8 +61,12 @@ slot_ret_t slot_header_init(void);
 void slot_table_format(void);
 
 slot_ret_t slot_occupy(const char *name, const uint8_t name_length,
-		       const slot_section_t section, uint8_t *pos_in_section);
+		       const slot_section_t section, uint8_t *pos_in_section,
+		       uint8_t order);
 slot_ret_t slot_free(const slot_section_t section, const uint8_t entry);
+slot_ret_t slot_update_metadata(const slot_section_t section,
+				const uint8_t entry, const uint8_t order,
+				const uint8_t write_offset);
 slot_ret_t slot_write(const slot_section_t section, const uint8_t entry,
 		      const uint8_t *data, const uint8_t data_size);
 slot_ret_t slot_read(const slot_section_t section, const uint8_t entry,

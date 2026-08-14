@@ -56,7 +56,7 @@ static inline uint8_t eeprom_ready(void) {
 void eeprom_init(void) { tw_init(TW_FREQ_400K, false); }
 
 void eeprom_write(uint16_t address, const uint8_t *data, uint16_t length) {
-  if ((uint32_t)address + length > EEPROM_PAGES * EEPROM_PAGE_SIZE)
+  if ((uint32_t)address + length > EEPROM_SIZE)
     return;
   while (length > 0) {
     uint16_t bytes_in_page = EEPROM_PAGE_SIZE - (address % EEPROM_PAGE_SIZE);
@@ -71,7 +71,7 @@ void eeprom_write(uint16_t address, const uint8_t *data, uint16_t length) {
 }
 
 void eeprom_read(uint16_t address, uint8_t *data, uint16_t length) {
-  if ((uint32_t)address + length > EEPROM_PAGES * EEPROM_PAGE_SIZE)
+  if ((uint32_t)address + length > EEPROM_SIZE)
     return;
   eeprom_sequential_read(address, data, length);
 }

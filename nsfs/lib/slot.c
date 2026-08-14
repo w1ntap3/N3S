@@ -2,6 +2,7 @@
 #include "eeprom.h"
 #include <stdint.h>
 #include <string.h>
+#include <sys/types.h>
 
 static const uint8_t metadata[HEADER_METADATA_BYTES] = {
 	'A', 'Z', 'E', HEADER_VERSION, 0, 0, 0, 0,
@@ -79,16 +80,60 @@ void slot_table_format(void) {
 }
 
 slot_ret_t slot_occupy(const char *name, const uint8_t name_length,
-		       const slot_section_t section, uint8_t *pos_in_section) {
+		       const slot_section_t section, uint8_t *pos_in_section,
+		       uint8_t order) {
 	if (!slots_initialized)
 		return SL_NOT_INITIALIZED;
 	slot_ret_t err = check_name(name, name_length);
 	if (err != SL_OK)
 		return err;
+	if (section >= HEADER_SECTIONS)
+		return SL_INVALID_SECTION;
+	if (!pos_in_section)
+		return SL_INVALID_BUFFER;
 
-	Slot entry;
-	memset(entry.name, ' ', SLOT_MAX_FILENAME);
-	memcpy(entry.name, name, name_length);
+	for (uint8_t entry = 0; entry < SLOTS_PER_SECTION; entry++) {
+		if (busy_slots[section] & (1ULL << entry))
+			continue;
+
+		Slot new_entry;
+		memset(new_entry.name, ' ', SLOT_MAX_FILENAME);
+		memcpy(new_entry.name, name, name_length);
+		new_entry.order = order;
+		new_entry.write_offset = 0;
+
+		eeprom_write(SLOT_ENTRIES_ADDRESS +
+				     (section * SLOTS_PER_SECTION + entry) *
+					     SLOT_ENTRY_SIZE,
+			     (uint8_t *)&new_entry, SLOT_ENTRY_SIZE);
+		update_slot_busy(section * SLOTS_PER_SECTION + entry, 1);
+
+		*pos_in_section = entry;
+		return SL_OK;
+	}
+	return SL_SECTION_BUSY;
+}
+
+slot_ret_t slot_update_metadata(const slot_section_t section,
+				const uint8_t entry, const uint8_t order,
+				const uint8_t write_offset) {
+	if (section >= HEADER_SECTIONS)
+		return SL_INVALID_SECTION;
+	if (entry >= SLOTS_PER_SECTION)
+		return SL_INVALID_SLOT;
+	if (!slots_initialized)
+		return SL_WRONG_METADATA;
+	if (!(busy_slots[section] & (1ULL << entry)))
+		return SL_INVALID_SLOT;
+	if (write_offset > SLOT_DATA_BYTES)
+		return SL_INVALID_SLOT;
+
+	uint8_t meta[2] = {order, write_offset};
+	eeprom_write(SLOT_ENTRIES_ADDRESS +
+			     (section * SLOTS_PER_SECTION + entry) *
+				     SLOT_ENTRY_SIZE +
+			     SLOT_MAX_FILENAME,
+		     meta, 2);
 	return SL_OK;
 }
 
@@ -113,14 +158,17 @@ slot_ret_t slot_free(const slot_section_t section, const uint8_t entry) {
 }
 slot_ret_t slot_write(const slot_section_t section, const uint8_t entry,
 		      const uint8_t *data, const uint8_t data_size) {
+	if (data_size == 0 || !data) {
+		return SL_NO_WRITE_DATA;
+	}
 	if (section >= HEADER_SECTIONS)
 		return SL_INVALID_SECTION;
 	if (entry >= SLOTS_PER_SECTION)
 		return SL_INVALID_SLOT;
 	if (!slots_initialized)
 		return SL_WRONG_METADATA;
-	if (!data)
-		return SL_NO_WRITE_DATA;
+	if (!(busy_slots[section] & (1ULL << entry)))
+		return SL_INVALID_SLOT;
 
 	uint8_t write_offset = 0;
 	eeprom_read(SLOT_ENTRIES_ADDRESS +
@@ -155,6 +203,8 @@ slot_ret_t slot_read(const slot_section_t section, const uint8_t entry,
 		return SL_INVALID_SLOT;
 	if (!slots_initialized)
 		return SL_WRONG_METADATA;
+	if (!(busy_slots[section] & (1ULL << entry)))
+		return SL_INVALID_SLOT;
 	if (!buf)
 		return SL_INVALID_BUFFER;
 

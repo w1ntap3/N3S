@@ -4,7 +4,7 @@
 /nsfs-cli/nsfs-cli
 fs.md
 fs.png
-.clang-format'
-.clangd'
+.clang-format
+.clangd
 .opencode/*
 /nsfs-cli/nsfs

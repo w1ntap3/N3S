@@ -5,8 +5,9 @@
 #include <stdint.h>
 
 #define EEPROM_ADDRESS (EEPROM_A2 << 2) | (EEPROM_A1 << 1) | EEPROM_A0
-#define EEPROM_PAGES 512
-#define EEPROM_PAGE_SIZE 64 // bytes/words
+#define EEPROM_PAGES 512UL
+#define EEPROM_PAGE_SIZE 64UL // bytes/words
+#define EEPROM_SIZE (EEPROM_PAGES * EEPROM_PAGE_SIZE)
 #define EEPROM_WRITE_ADDRESS 0b10100000 | (EEPROM_ADDRESS << 1) | 0
 #define EEPROM_READ_ADDRESS 0b10100000 | (EEPROM_ADDRESS << 1) | 1
 #define EEPROM_TIME_WRITE 5 // ms
