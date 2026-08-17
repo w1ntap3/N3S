@@ -1,9 +1,0 @@
-void nsfs_init();
-void nsfs_read_file();
-void nsfs_write_file();
-void nsfs_delete_file();
-void nsfs_list_files();
-void nsfs_get_metadata();
-void nsfs_get_stats();
-void nsfs_table_format();
-void nsfs_eeprom_format();

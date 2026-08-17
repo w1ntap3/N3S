@@ -37,7 +37,8 @@ typedef enum {
 	SLOT_TXT_SECTION = 0b00,
 	SLOT_EXE_SECTION = 0b01,
 	SLOT_VEC_SECTION = 0b10,
-	SLOT_IMG_SECTION = 0b11
+	SLOT_IMG_SECTION = 0b11,
+	SLOT_INVALID_SECTION
 } slot_section_t;
 
 typedef struct {
