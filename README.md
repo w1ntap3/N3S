@@ -1,51 +1,45 @@
+# N3S - Nano-Scale Sub-Systems
+- N3S stands for Nano-Scale Sub-Systems. It combines a custom EEPROM Filesystem (NSFS), Display Library (NSD) and Communication Protocol (NSP), along with a CLI tool to interact with the system from Linux PC (NSCLI). (Fun fact: N3S sounds like entrées showing the nature of the project being made of entrée-esque subsystems).
+- Project itself is meant for improving my skills in embedded/constrained environment C firmware development, systems engineering, writing portable code and modular software architecture.
+- Every subsystem has each of these modular layers below designed and implemented manually (Inspired by the book Reusable Firmware Development by Jacob Beningo).
+![API Architecture from Beningo's book](./reusable-firmware-architecture.png)
+
 # NSFS
 
-# About the project
+- NSFS subsystem implements a custom filesystem on an EEPROM with 4 file types. It contains 4 modules that progress in abstraction. modules for slots and files are completely abstracted from hardware specific code and can be ran on any MCU with very few tweaks.
 
-## Current stage: Implementation of the filesystem
+## Statistics
+- Efficiently uses 96.9% of raw EEPROM bits meaning minimal waste.
+- Lets users access and modify to 89.06% of the raw EEPROM bits.
+- Can store files up to 7.296KB in size.
+- NSFS allows 256 possible files
 
-- From-scratch UI API library (menu.c/.h) written from bare metal MMIO to API level graphics library. Supports rendering of pixels, lines, triangles, rectangles, characters/strings, menu items, loading bars, key:value pairs and render of files.
-- A nano-scale filesystem on EEPROM with multiple file types supported with reading and writing abilities.
-- PC<->MCU half-duplex communication through NSP (Nano Scale Protocol) over a USB-UART bridge with ability to write and retreat files to/from NSFS, dump the whole EEPROM to computer without losing/corrupting any of the data.
-
-# Usage Notes
-
-1. Text's Y position % 8 **must** be 0
-2. Before starting the project call hardware_init() and oled_clear()
-3. OLED screen has no ability to read data from the hardware. Call oled_flush() to write software graphical buffer into hardware.
+## Modules
+1. i2c.h
+  - Implements basic I2C to accomodate basic Controller-Peripheral communication. Low-level driver.
+2. eeprom.h
+  - Built over i2c.h, implements convenient EEPROM reading and writing interface. HAL for non volatile memory.
+3. slot.h
+  - Now completely abstracted from hardware, implements the fundamentals of the NSFS like the Header segment, with metadata and table of 4 sections of slots, and Data segment, mapping offset for data per each slot. Middleware to abstract away hardware completely.
+4. file.h
+  - Implements actual files and operations over them by representing a single file as an ordered combination of slots from the same section and with the same name. The final API layer.
 
 ## File types
+- Text file (.t)
+  - Read ASCII text
+- Executable file (.e)
+  - Manipulate GPIO pins with custom timing (e.g. turn LEDs ON/OFF in specific patterns)
+- Vector image (.v)
+  - Draw vector shapes (Dots, Lines, Rectangles and Triangles)
+- Bitmap image (.i)
+  - Render bitmap images
 
-### `.t` — Text
+# NSD
 
-Multiple pages of ASCII text.
+## Modules
 
-### `.b` — Bitmap image
+## Shapes and Text
 
-A 128×64 bilevel bitmap image.
+# NSP
 
-### `.v` — Vector image
-
-A 128×64 vector-based image made of basic shapes with individual properties:
-
-1. **Background** — normal or inverted
-2. **Rectangle** — p1,p2 (`gfx_pixel`), fill
-3. **Triangle** — p1,p2,p3 (`gfx_pixel`), fill
-4. **Line** — p1,p2 (`gfx_pixel`)
-
-### `.e` — Executable
-
-When opened, the file can:
-
-- Set/Toggle GPIO levels
-- Encode PWM, for example to generate different buzzer notes
-
-## PC interaction
-
-### Writing files to NSFS
-
-Use the web interface (or maybe CLI) to create NSFS files and transfer them to the MCU over NSP via USB-UART.
-
-### Dumping EEPROM
-
-You can smart-dump all NSFS files into a directory.
+# NSCLI

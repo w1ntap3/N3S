@@ -1,10 +1,9 @@
 /datasheets
-/nsfs/main
-/nsfs/main.hex
-/nsfs-cli/nsfs-cli
+/n3s/main
+/n3s/main.hex
 fs.md
 fs.png
 .clang-format
 .clangd
 .opencode/*
-/nsfs-cli/nsfs
+/nscli/nscli

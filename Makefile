@@ -1,4 +1,4 @@
-# AVR MAKEFILE FOR NSFS
+# AVR MAKEFILE FOR N3S
 
 # Hardware specifics
 MCU := m328p
@@ -9,8 +9,8 @@ BAUD := 9600
 F_CPU := 8000000UL
 
 # Program specifics
-TARGET := nsfs/main
-SRC := $(wildcard nsfs/*.c) $(wildcard nsfs/lib/*.c)
+TARGET := n3s/main
+SRC := $(wildcard n3s/*.c) $(wildcard n3s/lib/*.c)
 
 # Extra flags
 FLAGS := -Os -Wall -flto -ffunction-sections -fdata-sections -Wl,-gc-sections -mrelax
@@ -32,8 +32,8 @@ compile:
 	avr-objcopy -O ihex -R .eeprom ${TARGET} ${TARGET}.hex
 
 cli:
-	gcc -Wall -o nsfs-cli/nsfs nsfs-cli/main.c
-	cp nsfs-cli/nsfs ${BINDIR}
+	gcc -Wall -o nscli/nscli nscli/main.c
+	cp nscli/nscli ${BINDIR}
 
 clean:
-	rm -f ${TARGET} ${TARGET}.hex nsfs-cli/nsfs
+	rm -f ${TARGET} ${TARGET}.hex nscli/nscli
