@@ -7,6 +7,7 @@
 #define HEADER_METADATA_BYTES 8
 #define SLOT_ENTRIES_ADDRESS 0x08
 #define SLOT_MAX_FILENAME 8
+#define SLOT_MIN_FILENAME 1
 #define SLOTS_PER_SECTION 64
 #define SLOT_ENTRY_SIZE 10
 #define SLOT_DATA_BYTES 114
@@ -31,6 +32,8 @@ typedef enum {
 	SL_NOT_INITIALIZED,
 	SL_INVALID_NAME,
 	SL_SECTION_BUSY,
+	SL_ALREADY_FREE,
+	SL_WRONG_NAME_SIZE
 } slot_ret_t;
 
 typedef enum {
@@ -72,4 +75,7 @@ slot_ret_t slot_write(const slot_section_t section, const uint8_t entry,
 		      const uint8_t *data, const uint8_t data_size);
 slot_ret_t slot_read(const slot_section_t section, const uint8_t entry,
 		     uint8_t *buf, const uint8_t buf_size);
+slot_ret_t slot_get_by_name(const uint8_t *name, const uint8_t name_len,
+			    const slot_section_t section,
+			    uint8_t *ordered_entries, uint8_t *entry_count);
 #endif
