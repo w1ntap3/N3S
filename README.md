@@ -3,7 +3,7 @@
 - Project itself is meant for improving my skills in embedded/constrained environment C firmware development, systems engineering, writing portable code and modular software architecture.
 - Every subsystem has each of these modular layers below designed and implemented manually (Inspired by the book Reusable Firmware Development by Jacob Beningo).
 <p align="center">
-  <img src="./reusable-firmware-architecture.png" alt="API Architecture from Beningo's book">
+  <img src="./reusable-firmware-architecture.png" alt="API Architecture from Beningo's book" width="50%">
 </p>
 # NSFS - Nano-Scale Filesystem
 
