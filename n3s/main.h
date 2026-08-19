@@ -4,7 +4,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <avr/io.h>
-#include <stdint.h>
+typedef enum { MAIN_INIT = 0 } main_fsm_t;
 
 #endif
