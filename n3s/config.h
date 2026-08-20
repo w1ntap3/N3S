@@ -4,6 +4,7 @@
 #define CONFIG_H
 #include "lib/font.h"
 #include <avr/io.h>
+#include <stdint.h>
 // NSD
 
 // SPI OLED pinout
@@ -74,7 +75,9 @@
 #define BTN_APPLY_DDR DDRC
 #define BTN_APPLY_PIN PINC
 
-void hardware_init(void);
-uint8_t firmware_init(void);
+typedef enum { CFG_OK = 0, CFG_COULDNT_INITIALIZE } cfg_ret_t;
+
+cfg_ret_t hardware_init(void);
+cfg_ret_t firmware_init(void);
 
 #endif

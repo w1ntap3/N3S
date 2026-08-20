@@ -4,10 +4,9 @@
 #include "lib/slot.h"
 #include <avr/io.h>
 #include <avr/sfr_defs.h>
-#include <stdint.h>
 #include <util/delay.h>
 
-void hardware_init(void) {
+cfg_ret_t hardware_init(void) {
   // clock_prescaler_off
   CLKPR = (1 << CLKPCE);
   CLKPR = 0;
@@ -30,13 +29,12 @@ void hardware_init(void) {
 
   oled_init();
   eeprom_init();
+  return CFG_OK;
 }
 
-uint8_t firmware_init(void) {
+cfg_ret_t firmware_init(void) {
   slot_ret_t ret = slot_header_init();
   if (ret != SL_OK)
-    return 1;
-  return 0;
+    return (cfg_ret_t)ret;
+  return CFG_OK;
 }
-
-void nsfs_format(void) { slot_table_format(); }
