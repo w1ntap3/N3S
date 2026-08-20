@@ -1,8 +1,6 @@
 #include "oled.h"
 #include "../config.h"
-#include "avr/io.h"
 #include "util/delay.h"
-#include <stdlib.h>
 
 uint8_t oled_buffer[OLED_PAGES][OLED_SEG];
 
