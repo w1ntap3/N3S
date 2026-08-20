@@ -1,6 +1,7 @@
 #include "button.h"
 
-button_t btn_states[BTN_COUNT] = {BTN_RELEASED, BTN_RELEASED, BTN_RELEASED};
+volatile button_t btn_states[BTN_COUNT] = {BTN_RELEASED, BTN_RELEASED,
+                                           BTN_RELEASED};
 uint8_t suspicion[BTN_COUNT] = {0, 0, 0};
 
 static inline void button_event(const uint8_t btn, const uint8_t sample) {
@@ -8,7 +9,7 @@ static inline void button_event(const uint8_t btn, const uint8_t sample) {
   // we implicitly assume that if the current state happened because of
   // edge-change. by the time this function is called it means we just learned
   // about a transition in states. very simple logic
-  switch (btn) {
+  switch (sample) {
   case BTN_RELEASED:
     break;
   case BTN_PRESSED:

@@ -19,7 +19,7 @@
 typedef enum { MAIN_INIT = 0 } main_fsm_t;
 typedef enum { BTN_PRESSED = 0, BTN_RELEASED } button_t;
 
-extern button_t btn_states[BTN_COUNT];
+extern volatile button_t btn_states[BTN_COUNT];
 extern uint8_t suspicion[BTN_COUNT];
 
 void poll_buttons(void);

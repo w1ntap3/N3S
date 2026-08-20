@@ -35,7 +35,7 @@
 #define CELL_WIDTH (OLED_SCREEN_WIDTH / 2)
 #define CELL_HEIGHT FONT_HEIGHT
 #define CELL_COUNT                                                             \
-	(OLED_SCREEN_HEIGHT / CELL_HEIGHT) * (OLED_SCREEN_WIDTH / CELL_WIDTH)
+  (OLED_SCREEN_HEIGHT / CELL_HEIGHT) * (OLED_SCREEN_WIDTH / CELL_WIDTH)
 #define CELL_PADDING 5
 
 // NSFS
@@ -60,15 +60,19 @@
 #define UART_BAUD_RATE 9600
 
 // GPIO
+#define BTN_COUNT 3
 #define BTN_PREV PC3
 #define BTN_PREV_PORT PORTC
 #define BTN_PREV_DDR DDRC
-#define BTN_NEXT PC4
+#define BTN_PREV_PIN PINC
+#define BTN_NEXT PC1
 #define BTN_NEXT_PORT PORTC
 #define BTN_NEXT_DDR DDRC
-#define BTN_APPLY PC5
+#define BTN_NEXT_PIN PINC
+#define BTN_APPLY PC2
 #define BTN_APPLY_PORT PORTC
 #define BTN_APPLY_DDR DDRC
+#define BTN_APPLY_PIN PINC
 
 void hardware_init(void);
 uint8_t firmware_init(void);

@@ -5,5 +5,5 @@ fs.md
 fs.png
 .clang-format
 .clangd
-.opencode/*
+.agents/*
 /nscli/nscli

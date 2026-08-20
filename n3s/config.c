@@ -3,29 +3,40 @@
 #include "lib/oled.h"
 #include "lib/slot.h"
 #include <avr/io.h>
+#include <avr/sfr_defs.h>
 #include <stdint.h>
 #include <util/delay.h>
+
 void hardware_init(void) {
-	// clock_prescaler_off
-	CLKPR = (1 << CLKPCE);
-	CLKPR = 0;
+  // clock_prescaler_off
+  CLKPR = (1 << CLKPCE);
+  CLKPR = 0;
 
-	// OLED
-	OLED_RES_DDR |= _BV(OLED_RES);
-	OLED_DC_DDR |= _BV(OLED_DC);
-	OLED_D0_DDR |= _BV(OLED_D0);
-	OLED_D1_DDR |= _BV(OLED_D1);
-	OLED_CS_DDR |= _BV(OLED_CS);
+  // OLED
+  OLED_RES_DDR |= _BV(OLED_RES);
+  OLED_DC_DDR |= _BV(OLED_DC);
+  OLED_D0_DDR |= _BV(OLED_D0);
+  OLED_D1_DDR |= _BV(OLED_D1);
+  OLED_CS_DDR |= _BV(OLED_CS);
 
-	oled_init();
-	eeprom_init();
+  // Buttons
+  // Set as inputs and pull-up them
+  BTN_PREV_DDR &= ~_BV(BTN_PREV);
+  BTN_PREV_PORT |= _BV(BTN_PREV);
+  BTN_APPLY_DDR &= ~_BV(BTN_APPLY);
+  BTN_APPLY_PORT |= _BV(BTN_APPLY);
+  BTN_NEXT_DDR &= ~_BV(BTN_NEXT);
+  BTN_NEXT_PORT |= _BV(BTN_NEXT);
+
+  oled_init();
+  eeprom_init();
 }
 
 uint8_t firmware_init(void) {
-	slot_ret_t ret = slot_header_init();
-	if (ret != SL_OK)
-		return 1;
-	return 0;
+  slot_ret_t ret = slot_header_init();
+  if (ret != SL_OK)
+    return 1;
+  return 0;
 }
 
 void nsfs_format(void) { slot_table_format(); }
